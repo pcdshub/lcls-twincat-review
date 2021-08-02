@@ -1,0 +1,13 @@
+digraph {{ tsproj.name.replace("-", "_") }} {{ "{" }}
+    {%- for section, source_dict in [('DUTs', plc.obj.dut_by_name), ('GVLs', plc.obj.gvl_by_name), ('POUs', plc.obj.pou_by_name)] %}
+
+        {%- for source_name, source in source_dict | dictsort %}
+
+        {%- set related = source.get_source_code() | related_source(source_name, tsproj, plc) %}
+        {%- for item in related %}
+            {{ source_name }} -> {{ item }};
+        {% endfor %}
+
+        {%- endfor %}{# for dut_name, ... #}
+    {%- endfor %}{# for source_dict ... #}
+{{ "}" }}

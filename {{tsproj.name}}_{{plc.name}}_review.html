@@ -1,0 +1,153 @@
+<html>
+<head>
+    <style>
+        #toc_container {
+            background: #f9f9f9 none repeat scroll 0 0;
+            border: 1px solid #aaa;
+            display: table;
+            font-size: 95%;
+            margin-bottom: 1em;
+            padding: 20px;
+            width: auto;
+        }
+
+        .toc_title {
+            font-weight: 700;
+            text-align: center;
+        }
+
+        #toc_container li, #toc_container ul, #toc_container ul li{
+            list-style: outside none none !important;
+        }
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+        thead {
+            border: 1px dashed;
+        }
+        tbody {
+            border: none;
+        }
+        td {
+          border-right: solid 1px lightgray;
+          border-left: solid 1px lightgray;
+        }
+        .lineid {
+            font-family: monospace;
+            font-weight: bold;
+            text-align: right;
+            vertical-align: top;
+            width: 0;
+        }
+        .code {
+            font-family: monospace;
+            max-width: 60%;
+            word-wrap: break-word;
+        }
+        .note {
+            font-family: monospace;
+        }
+        .coderef {
+          color: black;
+        }
+        .unassuming-link {
+          color: black;
+          text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+
+<div id="toc_container">
+    <p class="toc_title">Contents</p>
+    <ul class="toc_list">
+{% for section, source_dict in [('DUTs', plc.obj.dut_by_name), ('GVLs', plc.obj.gvl_by_name), ('POUs', plc.obj.pou_by_name)] %}
+        <li>
+            <a href="#{{section}}">{{ section }}</a>
+             <ul>
+{% for source_name, source in source_dict | dictsort %}
+                 <li><a href="#{{ source_name }}">{{ loop.index }}. {{ source_name }}</a></li>
+{% endfor %}
+             </ul>
+        </li>
+{% endfor %}
+    </ul>
+</div>
+
+
+{% for section, source_dict in [('DUTs', plc.obj.dut_by_name), ('GVLs', plc.obj.gvl_by_name), ('POUs', plc.obj.pou_by_name)] %}
+
+<div id="{{ section }}" class="section">
+<h1>{{ section }}</h1>
+
+{% for source_name, source in source_dict | dictsort %}
+
+<h2 id="{{ source_name }}">{{ source_name }}</h2>
+
+{% set source_text = source.get_source_code() | link_known() %}
+
+<table>
+    <thead>
+        <tr>
+            <th>Line</th>
+            <th>Code</th>
+            <th>Notes</th>
+        </tr>
+    </thead>
+    <tbody>
+{% for line in source_text.splitlines() %}
+{% set lineid = source_name + ":" + loop.index | string %}
+        <tr>
+            <td id="{{ lineid }}" class="lineid">
+                <a class="unassuming-link" href="#{{lineid}}">{{ loop.index }}&nbsp;</a>
+            </td>
+            <td class="code">{{ line }}</td>
+            <td class="note"></td>
+        </tr>
+{% endfor %}
+    </tbody>
+</table>
+
+{% set related = source.get_source_code() | related_source(source_name, tsproj, plc) %}
+{% if related %}
+<br/>
+Related:
+<br/>
+<ul>
+{% for item in related %}
+    <li><a href="#{{ item }}">{{ item }}</a></li>
+{% endfor %}
+</ul>
+{% endif %}
+
+<h2>{{ source_name }} - API Usage Requirements</h2>
+<ul>
+    <li>
+    </li>
+</ul>
+
+<h2>{{ source_name }} - Assumptions for Correct Functionality</h2>
+<ul>
+    <li>
+    </li>
+</ul>
+
+<h2>{{ source_name }} - Failure Modes</h2>
+<ul>
+    <li>
+    </li>
+</ul>
+
+<h2>{{ source_name }} - Summary</h2>
+<ul>
+    <li>
+    </li>
+</ul>
+
+{% endfor %}{# for dut_name, ... #}
+{% endfor %}{# for source_dict ... #}
+</div>
+
+</body>
+</html>
